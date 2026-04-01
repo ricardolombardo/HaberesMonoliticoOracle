@@ -13,10 +13,12 @@ public class DatabaseConfig {
     @Bean
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-        dataSource.setUrl("jdbc:sqlserver://localhost:1433;databaseName=BASEHABERESMONOLITICO;encrypt=true;trustServerCertificate=true");
-        dataSource.setUsername("sa");
-        dataSource.setPassword("3663rsfv");
+        
+        dataSource.setDriverClassName("oracle.jdbc.OracleDriver");
+        dataSource.setUrl("jdbc:oracle:thin:@//localhost:1521/FREEPDB1");
+        dataSource.setUsername("BASEHABERESMONOLITICO");
+        dataSource.setPassword("rsfv3663");
+        
         return dataSource;
     }
 
