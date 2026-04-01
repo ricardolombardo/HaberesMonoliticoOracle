@@ -33,7 +33,7 @@ public class DepartamentoController {
     }
     
     @PostMapping
-    public Departamento crearPersona(@RequestBody Departamento departamento) {
+    public Departamento crearDepartamento(@RequestBody Departamento departamento) {
         return departamentoService.guardarDepartamento(departamento);
     }
     

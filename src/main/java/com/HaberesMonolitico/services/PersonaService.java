@@ -48,6 +48,8 @@ public class PersonaService {
         persona.setNombre(dto.getNombre());
         persona.setApellidoPaterno(dto.getApellidoPaterno());
         persona.setApellidoMaterno(dto.getApellidoMaterno());
+        persona.setAntiguedad(dto.getAntiguedad());
+        persona.setActivo(dto.getActivo());
         persona.setDepartamento(departamentoService.obtenerPorId(dto.getDepartamentoId()));
         
         Optional<Jerarquia> jerarquia=jerarquiaService.obtenerJerarquiaPorId(dto.getJerarquiaId());
