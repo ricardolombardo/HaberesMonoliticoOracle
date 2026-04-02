@@ -1,47 +1,44 @@
-IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'PRC_GEN_ANTIGUEDAD')
-BEGIN
-    DROP PROCEDURE PRC_GEN_ANTIGUEDAD;
-END
-GO
-
-CREATE PROCEDURE PRC_GEN_ANTIGUEDAD
-    @idLiquidacion INT
+CREATE OR REPLACE PROCEDURE PRC_GEN_ANTIGUEDAD (
+    p_idLiquidacion IN NUMBER
+)
 AS
+    v_anio NUMBER;
+    v_mes NUMBER;
+    v_fechaInicioLiquidacion DATE;
+    v_idConcepto NUMBER;
 BEGIN
-    SET NOCOUNT ON;
+    -- Obtener el ID del concepto
+    SELECT ID
+    INTO v_idConcepto
+    FROM CONCEPTO
+    WHERE CODIGO = 'D0005';
 
-    DECLARE @anio INT, @mes INT;
-    DECLARE @fechaInicioLiquidacion DATE;
-	DECLARE @idConcepto INT;
-
-	-- Obtener el ID del concepto
-	SELECT @idConcepto = ID
-	FROM CONCEPTO
-	WHERE CODIGO = 'D0005';
-
-    -- Obtener año y mes desde la tabla Liquidacion
-    SELECT @anio = L.ANIO, @mes = L.MES
+    -- Obtener año y mes desde LIQUIDACION
+    SELECT L.ANIO, L.MES
+    INTO v_anio, v_mes
     FROM LIQUIDACION L
-    WHERE L.ID = @idLiquidacion;
+    WHERE L.ID = p_idLiquidacion;
 
-    -- Calcular fecha
-    SET @fechaInicioLiquidacion = DATEFROMPARTS(@anio, @mes, 1);
+    -- Calcular fecha (equivalente a DATEFROMPARTS)
+    v_fechaInicioLiquidacion := TO_DATE(v_anio || '-' || v_mes || '-01', 'YYYY-MM-DD');
 
-    -- Insertar en TabuladoConcepto
-	INSERT INTO TABULADO_CONCEPTO (ID_TABULADO, ID_CONCEPTO, MONTO, SENTIDO)
-	SELECT 
-		T.ID,
-		@idConcepto,
-		P.ANTIGUEDAD * J.MONTO / 100,
-		'D'
-	FROM PERSONA P
-	JOIN NOU NOU ON NOU.ID_PERSONA = P.ID
-	JOIN EVENTO_NOU EN ON EN.NOU_ID = NOU.ID
-	JOIN EVENTO E ON E.ID = EN.EVENTO_ID
-	JOIN TABULADO T ON T.ID_NOU = NOU.ID
-	JOIN JERARQUIA J ON J.ID = P.ID_JERARQUIA
-	WHERE EN.FECHA_INICIO <= @fechaInicioLiquidacion
-	  AND EN.FECHA_FIN > @fechaInicioLiquidacion
-	  AND T.ID_LIQUIDACION = @idLiquidacion
-	  AND E.IDENTIFICADOR = 'ANTIGUEDAD';
+    -- Insertar en TABULADO_CONCEPTO
+    INSERT INTO TABULADO_CONCEPTO (ID_TABULADO, ID_CONCEPTO, MONTO, SENTIDO)
+    SELECT 
+        T.ID,
+        v_idConcepto,
+        P.ANTIGUEDAD * J.MONTO / 100,
+        'D'
+    FROM PERSONA P
+    JOIN NOU N ON N.ID_PERSONA = P.ID
+    JOIN EVENTO_NOU EN ON EN.NOU_ID = N.ID
+    JOIN EVENTO E ON E.ID = EN.EVENTO_ID
+    JOIN TABULADO T ON T.ID_NOU = N.ID
+    JOIN JERARQUIA J ON J.ID = P.ID_JERARQUIA
+    WHERE EN.FECHA_INICIO <= v_fechaInicioLiquidacion
+      AND EN.FECHA_FIN > v_fechaInicioLiquidacion
+      AND T.ID_LIQUIDACION = p_idLiquidacion
+      AND E.IDENTIFICADOR = 'ANTIGUEDAD';
+
 END;
+/

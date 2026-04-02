@@ -17,26 +17,27 @@ public class GenericDAOExecutor {
     private EntityManager entityManager;
 	
 	@Transactional
-    public void ejecutarSP(String sp, Hashtable<String, Object> params) {
+	public void ejecutarSP(String sp, Hashtable<String, Object> params) {
 
-        StringJoiner joiner = new StringJoiner(", ");
-        for (String key : params.keySet()) {
-            joiner.add(":" + key);
-        }
+	    StringJoiner joiner = new StringJoiner(", ");
+	    for (String key : params.keySet()) {
+	        joiner.add(":" + key);
+	    }
 
-        String sql = "EXEC " + sp + " " + joiner.toString();
+	    // Construir SQL Oracle PL/SQL
+	    String sql = "BEGIN " + sp + "(" + joiner.toString() + "); END;";
 
-        Query query = entityManager.createNativeQuery(sql);
+	    Query query = entityManager.createNativeQuery(sql);
 
-        // Setear parámetros
-        System.out.print(sql+" ");
-        for (Map.Entry<String, Object> entry : params.entrySet()) {
-        	System.out.print(entry.getKey()+" "+entry.getValue());
-            query.setParameter(entry.getKey(), entry.getValue());
-        }
-        System.out.println();
+	    // Setear parámetros
+	    System.out.print(sql + " ");
+	    for (Map.Entry<String, Object> entry : params.entrySet()) {
+	        System.out.print(entry.getKey() + " " + entry.getValue() + " ");
+	        query.setParameter(entry.getKey(), entry.getValue());
+	    }
+	    System.out.println();
 
-        query.executeUpdate();
-    }
+	    query.executeUpdate();
+	}
 
 }

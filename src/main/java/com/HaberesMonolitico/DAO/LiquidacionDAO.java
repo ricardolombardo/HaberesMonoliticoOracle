@@ -14,26 +14,30 @@ public class LiquidacionDAO {
 	@Autowired
     private EntityManager entityManager;
 
-    public void ejecutarSPGenerarTabulados(Long idLiquidacion) {
-        entityManager
-            .createNativeQuery("EXEC PRC_GEN_TABULADOS :idLiquidacion")
-            .setParameter("idLiquidacion", idLiquidacion.intValue())
-            .executeUpdate();
-    }
+	public void ejecutarSPGenerarTabulados(Long idLiquidacion) {
+		System.out.println("Generando los tabulados para la liquidacion "+idLiquidacion);
+	    entityManager.createNativeQuery(
+	        "BEGIN PRC_GEN_TABULADOS(:idLiquidacion); END;"
+	    )
+	    .setParameter("idLiquidacion", idLiquidacion)
+	    .executeUpdate();
+	}
     
-    public void ejecutarSPGenerarBasico(Long idLiquidacion) {
-        entityManager
-            .createNativeQuery("EXEC PRC_GEN_BASICO :idLiquidacion")
-            .setParameter("idLiquidacion", idLiquidacion.intValue())
-            .executeUpdate();
-    }
+	public void ejecutarSPGenerarBasico(Long idLiquidacion) {
+		System.out.println("Generando los basicos para la liquidacion "+idLiquidacion);
+	    entityManager
+	        .createNativeQuery("BEGIN PRC_GEN_BASICO(:idLiquidacion); END;")
+	        .setParameter("idLiquidacion", idLiquidacion)
+	        .executeUpdate();
+	}
     
-    public void ejecutarSPGenerarTitulo(Long idLiquidacion) {
-        entityManager
-            .createNativeQuery("EXEC PRC_GEN_TITULO :idLiquidacion")
-            .setParameter("idLiquidacion", idLiquidacion.intValue())
-            .executeUpdate();
-    }
+	public void ejecutarSPGenerarTitulo(Long idLiquidacion) {
+		System.out.println("Generando lo ingreso por tirulos para la liquidacion "+idLiquidacion);
+	    entityManager
+	        .createNativeQuery("BEGIN PRC_GEN_TITULO(:idLiquidacion); END;")
+	        .setParameter("idLiquidacion", idLiquidacion)
+	        .executeUpdate();
+	}
     
     @SuppressWarnings("unchecked")
 	public List<Object[]> generarReporteLiquidaciones(
